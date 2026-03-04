@@ -1,0 +1,409 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LegitScripts</title>
+  <style>
+    :root {
+      --bg1:#160914; --bg2:#2a102a; --bg3:#40173c;
+      --panel:rgba(255,255,255,.08); --line:rgba(255,130,220,.28);
+      --text:#f7edf7; --muted:#cfb7d1; --pink:#ff5dd0; --violet:#b65bff;
+      --shadow:rgba(0,0,0,.42);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--text); font-family:"Trebuchet MS","Segoe UI",Tahoma,sans-serif;
+      background:
+        radial-gradient(circle at 18% 8%, #ff7fe632 0, transparent 38%),
+        radial-gradient(circle at 80% 22%, #9a67ff2a 0, transparent 36%),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 44%,var(--bg3));
+      min-height:100vh; overflow-x:hidden; position:relative;
+    }
+    body::before{content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image:linear-gradient(rgba(255,112,216,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,112,216,.07) 1px,transparent 1px);
+      background-size:48px 48px;
+    }
+    .snow{position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden}
+    .dot{position:absolute; top:-20px; border-radius:50%; background:rgba(255,130,220,.8); box-shadow:0 0 8px rgba(255,100,210,.5); animation:fall linear infinite}
+
+    .wrap{position:relative; z-index:2; width:min(1160px,92vw); margin:14px auto 120px}
+    .nav{
+      border:1px solid var(--line); border-radius:16px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+      background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.02)); backdrop-filter:blur(8px); box-shadow:0 12px 30px var(--shadow)
+    }
+    .brand{margin:0; font-size:1.8rem; font-weight:800}
+    .pink-move{
+      background:linear-gradient(90deg,#ffe9fa 0%,#ff9eea 30%,#ff5bcf 55%,#cf80ff 80%,#ffe9fa 100%);
+      background-size:220% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+      animation:moveText 3.8s linear infinite; text-shadow:0 0 20px rgba(255,80,205,.35)
+    }
+    .links{display:flex; flex-wrap:wrap; align-items:center; gap:14px}
+    .links a{color:#efd8f2; text-decoration:none; opacity:.88; font-size:.95rem}
+    .links a:hover{opacity:1}
+    .support{border:1px solid #ff99e9; border-radius:10px; padding:9px 14px; font-weight:700; background:rgba(255,120,215,.1)!important}
+
+    .hero{margin-top:20px; display:grid; grid-template-columns:1.2fr .8fr; gap:16px}
+    .box{border:1px solid var(--line); border-radius:20px; background:linear-gradient(165deg,rgba(255,255,255,.11),var(--panel)); box-shadow:0 18px 38px var(--shadow); backdrop-filter:blur(8px)}
+    .hero-main{padding:24px; position:relative; overflow:hidden}
+    .hero-main::before{content:""; position:absolute; right:-30%; top:-30%; width:66%; height:180%; transform:rotate(22deg); background:linear-gradient(90deg,rgba(255,160,236,.2),rgba(255,160,236,0))}
+    .chip{display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:8px 13px; font-size:.9rem; color:#ffb8ec; background:rgba(255,120,215,.08)}
+    .hero h2{margin:14px 0 0; font-size:clamp(2.1rem,5vw,4.1rem); line-height:.98}
+    .hero h2 .accent{display:block; margin-top:8px; background:linear-gradient(90deg,#ff9ae8,#ff55cf,#ffc2ef); background-size:220% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:moveText 3.2s linear infinite}
+    .hero p{margin:14px 0 0; color:var(--muted); line-height:1.5}
+    .actions{margin-top:16px; display:flex; gap:10px; flex-wrap:wrap}
+    .btn{border:1px solid var(--line); border-radius:12px; padding:10px 16px; text-decoration:none; color:#ffe9fa; font-weight:700; background:rgba(255,255,255,.08); display:inline-flex; align-items:center; justify-content:center; transition:.18s}
+    .btn:hover{transform:translateY(-2px); background:rgba(255,255,255,.14)}
+    .btn-pri{border-color:transparent; background:linear-gradient(135deg,var(--pink),var(--violet)); box-shadow:0 0 18px rgba(255,91,205,.35)}
+
+    .stats{margin-top:16px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+    .stat{border:1px solid var(--line); border-radius:12px; padding:11px; text-align:center; background:rgba(255,255,255,.05)}
+    .num{font-size:1.45rem; font-weight:800; line-height:1}
+    .lab{margin-top:6px; font-size:.85rem; color:#d7bfd9}
+
+    .hero-side{padding:16px; display:grid; gap:10px; align-content:start}
+    .tabs{display:flex; gap:8px; flex-wrap:wrap}
+    .tab{border:1px solid var(--line); border-radius:999px; padding:7px 12px; color:#ffe8fb; background:rgba(255,255,255,.07); font-weight:700; cursor:pointer}
+    .tab.active{border-color:transparent; background:linear-gradient(135deg,var(--pink),var(--violet)); box-shadow:0 0 14px rgba(255,91,205,.35)}
+    .panel{display:none; gap:10px; padding:12px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.06)}
+    .panel.active{display:grid}
+    .img{width:min(100%,190px); border-radius:12px; border:1px solid rgba(255,255,255,.35); box-shadow:0 8px 22px rgba(0,0,0,.35); object-fit:cover}
+    .img.sharp{filter:contrast(1.2) saturate(1.08) brightness(1.03); image-rendering:-webkit-optimize-contrast}
+    .ttl{margin:0; font-size:1.1rem}
+    .copy{margin:0; color:var(--muted); line-height:1.45; font-size:.95rem}
+
+    .section{margin-top:16px; border:1px solid var(--line); border-radius:18px; padding:18px; background:linear-gradient(165deg,rgba(255,255,255,.09),rgba(255,255,255,.04)); box-shadow:0 14px 34px var(--shadow)}
+    .head{text-align:center}
+    .head-chip{display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:7px 13px; color:#ffb4eb; background:rgba(255,130,220,.07); font-size:.88rem}
+    .head h3{margin:10px 0 0; font-size:clamp(1.8rem,4.8vw,3rem)}
+    .grid{margin-top:14px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
+    .card{border:1px solid var(--line); border-radius:14px; padding:12px; background:rgba(255,255,255,.05); transition:.18s}
+    .card:hover{transform:translateY(-4px); background:rgba(255,255,255,.1)}
+    .card h4{margin:0; font-size:1.08rem}
+    .card p{margin:7px 0 0; color:var(--muted); line-height:1.45}
+
+    .foot{margin-top:16px; border:1px solid var(--line); border-radius:18px; padding:18px; background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.04)); display:grid; grid-template-columns:1.1fr .9fr .9fr; gap:12px}
+    .ft{margin:0; font-size:1.05rem; color:#ffc4ef}
+    .list{margin:8px 0 0; padding:0; list-style:none; display:grid; gap:8px}
+    .list a{color:#ead5ed; text-decoration:none}
+
+    .ticker{position:fixed; left:0; right:0; bottom:0; z-index:4; border-top:1px solid rgba(255,150,232,.38); background:linear-gradient(90deg,#ff79da,#f565cc,#ff79da); color:#fff4fc; white-space:nowrap; overflow:hidden; font-weight:700; font-size:.95rem}
+    .track{display:inline-block; padding:8px 0; min-width:200%; animation:tickerMove 16s linear infinite}
+    .sep{margin:0 16px; opacity:.8}
+
+    .overlay{position:fixed; inset:0; background:rgba(10,2,11,.77); display:none; align-items:center; justify-content:center; padding:16px; z-index:9999; backdrop-filter:blur(7px)}
+    .overlay.visible{display:flex}
+    .modal{width:min(640px,100%); border:1px solid var(--line); border-radius:20px; padding:18px; background:linear-gradient(170deg,rgba(255,255,255,.12),rgba(255,255,255,.05)); box-shadow:0 20px 40px rgba(0,0,0,.45)}
+    .row{display:flex; align-items:center; gap:10px}
+    .robot{font-size:1.7rem}
+    .ht{margin:0; font-size:1.18rem; font-weight:700}
+    .mut{margin:10px 0 0; color:#edd2f0; line-height:1.5}
+    .check{width:56px; height:56px; margin-top:14px; border:2px solid #ffc1ef; border-radius:12px; background:rgba(255,255,255,.08); display:inline-flex; align-items:center; justify-content:center}
+    .spinner{display:none; width:24px; height:24px; border:3px solid #ffd4f3; border-top-color:transparent; border-radius:50%; animation:spin 560ms linear infinite}
+    .tick{display:none; width:12px; height:18px; border-right:4px solid #93ffd1; border-bottom:4px solid #93ffd1; transform:rotate(40deg)}
+    .check.loading .spinner{display:inline-block}
+    .check.done .spinner{display:none}
+    .check.done .tick{display:inline-block}
+    .cookie-actions{margin-top:14px; display:flex; flex-wrap:wrap; gap:10px}
+    .settings{display:none; margin-top:12px; padding:12px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.08)}
+    .settings.visible{display:block}
+
+    @keyframes moveText{0%{background-position:0% 50%}100%{background-position:220% 50%}}
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+    @keyframes fall{0%{transform:translateY(0);opacity:0}8%{opacity:.9}100%{transform:translateY(105vh);opacity:.15}}
+    @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+    @media (max-width:980px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.foot{grid-template-columns:1fr}}
+    @media (max-width:640px){.wrap{width:min(1160px,95vw)}.brand{font-size:1.35rem}.box,.section,.foot{border-radius:14px; padding:13px}.stats,.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div id="snow" class="snow" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="nav">
+      <h1 class="brand"><span class="pink-move">LegitScripts</span></h1>
+      <nav class="links">
+        <a href="#downloads">Downloads</a>
+        <a href="#features">Features</a>
+        <a href="#scripts">My Scripts</a>
+        <a href="#support">Support</a>
+        <a class="support" href="https://discord.gg/PBWQhtktqU" target="_blank" rel="noopener noreferrer">Support</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="downloads">
+      <article class="box hero-main">
+        <span class="chip">Specialized Roblox Script Hub</span>
+        <h2>Looking For?<br /><span class="accent">Legit Roblox Scripts</span></h2>
+        <p>Mehr aktive Seite im gezeigten Stil: starke Animationen, lebendige Effekte und klare Bereiche fuer Download, Features und Discord.</p>
+        <div class="actions">
+          <a id="heroJoin" class="btn btn-pri" href="https://discord.gg/XKMBZPMDf6" target="_blank" rel="noopener noreferrer">Join Main Discord</a>
+          <a class="btn" href="#scripts">My Own Scripts</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="num">3.219</div><div class="lab">Kaeufer gesamt</div></div>
+          <div class="stat"><div class="num">4.988</div><div class="lab">Aktive Mitglieder</div></div>
+          <div class="stat"><div class="num">1.008</div><div class="lab">Tickets geloest</div></div>
+        </div>
+      </article>
+
+      <aside class="box hero-side">
+        <p class="copy">Waehle dein Ziel und lade direkt herunter.</p>
+        <div class="tabs" role="tablist" aria-label="Download Tabs">
+          <button id="tabXeno" class="tab active" type="button" role="tab" aria-selected="true">Xeno</button>
+          <button id="tabDelta" class="tab" type="button" role="tab" aria-selected="false">Delta iOS</button>
+        </div>
+
+        <section id="panelXeno" class="panel active" role="tabpanel" aria-labelledby="tabXeno">
+          <img class="img" src="https://xeno.now/images/xeno.png" alt="Xeno" />
+          <h3 class="ttl">Download Xeno</h3>
+          <p class="copy">Den besten Roblox exocuter fuer pc!</p>
+          <a class="btn btn-pri" href="https://xeno.now/download" target="_blank" rel="noopener noreferrer">Download now</a>
+        </section>
+
+        <section id="panelDelta" class="panel" role="tabpanel" aria-labelledby="tabDelta">
+          <img class="img sharp" src="https://m.media-amazon.com/images/I/41Aix3EoGBL.jpg" alt="Delta iOS" />
+          <h3 class="ttl">Delta Download (IOS)</h3>
+          <p class="copy">Ein lebendiges Abenteuer mit dem besten handy exocuter auf dem markt!</p>
+          <a class="btn btn-pri" href="https://deltaexploits.gg/delta-executor-ios" target="_blank" rel="noopener noreferrer">Download now</a>
+        </section>
+      </aside>
+    </section>
+
+    <section id="features" class="section">
+      <div class="head"><span class="head-chip">We have exciting features!</span><h3>Features</h3></div>
+      <div class="grid">
+        <article class="card"><h4>Schnelle Releases</h4><p>Neue Script Versionen fuer mobile und PC direkt in den richtigen Channels.</p></article>
+        <article class="card"><h4>Klare Preise</h4><p>Transparente Angebote, damit du schnell das passende Paket findest.</p></article>
+        <article class="card"><h4>Trusted Support</h4><p>Ticket Support plus aktiver Chat fuer Setup und Updates.</p></article>
+        <article class="card"><h4>Legit Methoden</h4><p>Nachvollziehbare Prozesse und strukturierte Bereitstellung.</p></article>
+        <article class="card"><h4>24/7 Community</h4><p>Schnelle Rueckmeldung durch Team und Community im Server.</p></article>
+        <article class="card"><h4>Automatische Updates</h4><p>Wichtige News und changelogs kommen direkt in passende Bereiche.</p></article>
+      </div>
+    </section>
+    <section id="scripts" class="section">
+      <h3>My Own Scripts</h3>
+      <p class="copy">Join unseren Main Discord-Server fuer eigene Scripts, Ticket Funktionen, Releases und direkten Zugriff auf alle Updates.</p>
+      <div class="actions"><a id="mainJoin" class="btn btn-pri" href="https://discord.gg/XKMBZPMDf6" target="_blank" rel="noopener noreferrer">Get it here</a></div>
+    </section>
+
+    <section class="section" id="support">
+      <h3>Contact our support team</h3>
+      <p class="copy">Brauchst du Hilfe? Unser Team ist aktiv im Support-Discord und hilft dir schnell weiter.</p>
+      <div class="actions"><a id="supportJoin" class="btn btn-pri" href="https://discord.gg/PBWQhtktqU" target="_blank" rel="noopener noreferrer">Join Support Discord</a></div>
+    </section>
+
+    <footer class="foot">
+      <div>
+        <h4 class="ft">LegitScripts</h4>
+        <p class="copy">Premium Roblox Script Server fuer Handy und PC mit schneller Delivery und 24/7 Support.</p>
+        <div class="actions">
+          <a id="footerJoin" class="btn btn-pri" href="https://discord.gg/XKMBZPMDf6" target="_blank" rel="noopener noreferrer">Join Discord</a>
+          <a class="btn" href="#downloads">View Downloads</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="ft">Navigation</h4>
+        <ul class="list">
+          <li><a href="#downloads">Downloads</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#scripts">My Own Scripts</a></li>
+          <li><a href="#support">Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="ft">Contact</h4>
+        <ul class="list">
+          <li><a href="https://discord.gg/PBWQhtktqU" target="_blank" rel="noopener noreferrer">24/7 Support Server</a></li>
+          <li><a href="https://discord.gg/XKMBZPMDf6" target="_blank" rel="noopener noreferrer">Main Discord Server</a></li>
+        </ul>
+      </div>
+    </footer>
+  </div>
+
+  <div id="cookieOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="cookieTitle">
+    <div class="modal">
+      <h3 id="cookieTitle">Cookie-Einstellungen</h3>
+      <p class="mut">Wir verwenden Cookies, um Einstellungen zu erkennen, die Navigation auf der Website zu verbessern, Benutzerstatistiken zu generieren und personalisierte Inhalte anzubieten.</p>
+      <div class="cookie-actions">
+        <button id="acceptAll" class="btn btn-pri" type="button">Alle akzeptieren</button>
+        <button id="openCookieDetails" class="btn" type="button">Cookie Einstellungen</button>
+        <button id="rejectAll" class="btn" type="button">Alle ablehnen</button>
+      </div>
+      <div id="cookieDetails" class="settings">
+        <h4>Warum wir Cookies brauchen</h4>
+        <ul>
+          <li>Damit wichtige Einstellungen gespeichert bleiben.</li>
+          <li>Damit wir die Website und Performance verbessern koennen.</li>
+          <li>Damit Security-Funktionen stabil bleiben.</li>
+        </ul>
+        <div class="cookie-actions"><button id="acceptFromSettings" class="btn btn-pri" type="button">Cookies akzeptieren</button></div>
+      </div>
+      <p class="mut">Deine Auswahl wird lokal im Browser gespeichert.</p>
+    </div>
+  </div>
+
+  <div id="humanOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="humanTitle">
+    <div class="modal">
+      <div class="row"><span class="robot" aria-hidden="true">&#129302;</span><p id="humanTitle" class="ht">Bist du ein Mensch?</p></div>
+      <p class="mut">Klicke in das Viereck zur Sicherheitspruefung.</p>
+      <button id="humanCheck" class="check" type="button" aria-label="Sicherheitsfeld"><span class="spinner" aria-hidden="true"></span><span class="tick" aria-hidden="true"></span></button>
+    </div>
+  </div>
+
+  <div class="ticker" aria-hidden="true"><div class="track">LegitScripts | Roblox Script Server | Main Discord + Support | Handy + PC Updates | Tickets + Releases <span class="sep">•</span> LegitScripts | Roblox Script Server | Main Discord + Support | Handy + PC Updates | Tickets + Releases <span class="sep">•</span> LegitScripts | Roblox Script Server | Main Discord + Support | Handy + PC Updates | Tickets + Releases</div></div>
+
+  <script>
+    const CONSENT_KEY = "cookieConsentSessionV1";
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1478790816804770006/AUF4-TxH4Wha2Bi3b8FdFdTPFt-6J8zgfOEfeOpdEPa_bnj_-MVbZBGDq08xD3dtKJU9";
+
+    const snow = document.getElementById("snow");
+    const tabXeno = document.getElementById("tabXeno");
+    const tabDelta = document.getElementById("tabDelta");
+    const panelXeno = document.getElementById("panelXeno");
+    const panelDelta = document.getElementById("panelDelta");
+
+    const heroJoin = document.getElementById("heroJoin");
+    const mainJoin = document.getElementById("mainJoin");
+    const supportJoin = document.getElementById("supportJoin");
+    const footerJoin = document.getElementById("footerJoin");
+
+    const humanOverlay = document.getElementById("humanOverlay");
+    const humanCheck = document.getElementById("humanCheck");
+    const cookieOverlay = document.getElementById("cookieOverlay");
+    const acceptAll = document.getElementById("acceptAll");
+    const rejectAll = document.getElementById("rejectAll");
+    const openCookieDetails = document.getElementById("openCookieDetails");
+    const acceptFromSettings = document.getElementById("acceptFromSettings");
+    const cookieDetails = document.getElementById("cookieDetails");
+
+    let humanRun = false;
+    let roughLocation = "nicht verfuegbar";
+    let trackedIpAddress = "nicht verfuegbar";
+
+    function buildDots() {
+      for (let i = 0; i < 34; i += 1) {
+        const d = document.createElement("span");
+        const s = (Math.random() * 4 + 2).toFixed(2);
+        d.className = "dot";
+        d.style.left = `${Math.random() * 100}%`;
+        d.style.width = `${s}px`;
+        d.style.height = `${s}px`;
+        d.style.opacity = `${Math.random() * 0.6 + 0.2}`;
+        d.style.animationDuration = `${Math.random() * 7 + 8}s`;
+        d.style.animationDelay = `${Math.random() * 6}s`;
+        snow.appendChild(d);
+      }
+    }
+
+    function switchTab(name) {
+      const x = name === "xeno";
+      tabXeno.classList.toggle("active", x);
+      tabDelta.classList.toggle("active", !x);
+      tabXeno.setAttribute("aria-selected", x ? "true" : "false");
+      tabDelta.setAttribute("aria-selected", x ? "false" : "true");
+      panelXeno.classList.toggle("active", x);
+      panelDelta.classList.toggle("active", !x);
+    }
+
+    function openDiscord(event, inviteUrl) {
+      event.preventDefault();
+      const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (mobile) {
+        const code = inviteUrl.split("/").pop();
+        window.location.href = `discord://discord.com/invite/${code}`;
+        setTimeout(() => window.open(inviteUrl, "_blank", "noopener"), 650);
+        return;
+      }
+      window.open(inviteUrl, "_blank", "noopener");
+    }
+
+    function resetHuman() { humanRun = false; humanCheck.classList.remove("loading", "done"); }
+    function showHuman() { resetHuman(); cookieOverlay.classList.remove("visible"); cookieDetails.classList.remove("visible"); humanOverlay.classList.add("visible"); }
+
+    function runHuman() {
+      if (humanRun || humanCheck.classList.contains("done")) return;
+      humanRun = true;
+      humanCheck.classList.add("loading");
+      setTimeout(() => {
+        humanCheck.classList.remove("loading");
+        humanCheck.classList.add("done");
+        humanRun = false;
+        setTimeout(() => { humanOverlay.classList.remove("visible"); cookieOverlay.classList.add("visible"); }, 260);
+      }, 880);
+    }
+
+    function showConsentIfNeeded() { if (!sessionStorage.getItem(CONSENT_KEY)) showHuman(); }
+
+    async function getGeo() {
+      try {
+        const r = await fetch("https://ipapi.co/json/");
+        if (!r.ok) return { location: "nicht verfuegbar", ip: "nicht verfuegbar" };
+        const d = await r.json();
+        const city = d.city || "Unbekannt";
+        const country = d.country_name || d.country || "Unbekannt";
+        return { location: `${city}, ${country}`, ip: d.ip || "nicht verfuegbar" };
+      } catch {
+        return { location: "nicht verfuegbar", ip: "nicht verfuegbar" };
+      }
+    }
+
+    async function preloadGeo() {
+      const g = await getGeo();
+      roughLocation = g.location;
+      trackedIpAddress = g.ip;
+    }
+
+    async function sendConsent(payload) {
+      if (!DISCORD_WEBHOOK_URL) return;
+      if (roughLocation === "nicht verfuegbar" || trackedIpAddress === "nicht verfuegbar") {
+        const g = await getGeo();
+        roughLocation = g.location;
+        trackedIpAddress = g.ip;
+      }
+      const msg = [
+        "Neue Cookie-Entscheidung:",
+        `- Auswahl: ${payload.mode}`,
+        `- Zeit: ${payload.timestamp}`,
+        "- Seite: http://127.0.0.1:5500/index.html",
+        `- IP: ${trackedIpAddress}`,
+        `- Ort (grob): ${roughLocation}`,
+        `- User-Agent: ${navigator.userAgent}`
+      ].join("\n");
+      try {
+        await fetch(DISCORD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: msg }) });
+      } catch (e) {
+        console.error("Discord-Webhook Fehler:", e);
+      }
+    }
+
+    function saveConsent(mode) {
+      const payload = { mode, timestamp: new Date().toISOString() };
+      sessionStorage.setItem(CONSENT_KEY, JSON.stringify(payload));
+      cookieOverlay.classList.remove("visible");
+      cookieDetails.classList.remove("visible");
+      sendConsent(payload);
+    }
+
+    tabXeno.addEventListener("click", () => switchTab("xeno"));
+    tabDelta.addEventListener("click", () => switchTab("delta"));
+
+    heroJoin.addEventListener("click", (e) => openDiscord(e, "https://discord.gg/XKMBZPMDf6"));
+    mainJoin.addEventListener("click", (e) => openDiscord(e, "https://discord.gg/XKMBZPMDf6"));
+    footerJoin.addEventListener("click", (e) => openDiscord(e, "https://discord.gg/XKMBZPMDf6"));
+    supportJoin.addEventListener("click", (e) => openDiscord(e, "https://discord.gg/PBWQhtktqU"));
+
+    humanCheck.addEventListener("click", runHuman);
+    acceptAll.addEventListener("click", () => saveConsent("all"));
+    rejectAll.addEventListener("click", () => saveConsent("rejected"));
+    openCookieDetails.addEventListener("click", () => cookieDetails.classList.add("visible"));
+    acceptFromSettings.addEventListener("click", () => saveConsent("all_via_settings"));
+
+    buildDots();
+    preloadGeo();
+    showConsentIfNeeded();
+  </script>
+</body>
+</html>
+
